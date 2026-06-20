@@ -1,4 +1,4 @@
-name: Build C# WPF App
+name: Build Background Clicker TW
 
 on:
   push:
@@ -7,29 +7,27 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2019 # 使用相容性最高的 Windows 2019 環境
 
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 8.0.x # 如果編譯失敗可以改成 6.0.x 或 7.0.x
-
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
 
-    - name: Restore Dependencies
-      run: msbuild /t:Restore
+    - name: Setup NuGet
+      uses: NuGet/setup-nuget@v2
 
-    - name: Build Application
-      run: msbuild /p:Configuration=Release /p:Platform="Any CPU"
+    - name: Restore NuGet Packages
+      run: nuget restore BackgroundClicker.sln
 
-    - name: Upload Artifact
+    - name: Build Solution
+      run: msbuild BackgroundClicker.sln /p:Configuration=Release /p:Platform="Any CPU"
+
+    - name: Upload Finished EXE
       uses: actions/upload-artifact@v4
       with:
-        name: BackgroundClicker-繁體中文版
+        name: BackgroundClicker-繁體中文免安裝版
         path: |
-          **/bin/Release/
-          **/bin/x64/Release/
+          **/bin/Release/*.exe
+          **/bin/Release/*.dll
